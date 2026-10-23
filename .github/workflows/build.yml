@@ -35,7 +35,7 @@ jobs:
         shell: ${{ matrix.shell }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up MSYS2 (Windows)
         if: runner.os == 'Windows'
@@ -50,7 +50,7 @@ jobs:
             mingw-w64-ucrt-x86_64-gcc
 
       - name: Cache bundled dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: deps
           key: deps-${{ runner.os }}-${{ hashFiles('Makefile') }}
@@ -70,7 +70,7 @@ jobs:
           ./${{ matrix.exe }} check --db ci.db --company acme
 
       - name: Upload binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ledger-${{ matrix.name }}
           path: ${{ matrix.exe }}
@@ -79,7 +79,7 @@ jobs:
     name: linux-system-libs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install SQLite and cJSON
         run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev libcjson-dev
       - name: Build against system libraries
@@ -99,7 +99,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
 
@@ -111,11 +111,17 @@ jobs:
           done
           ls -l *.zip
 
-      - name: Create GitHub release
+      - name: Publish binaries to the GitHub release
+        # Reuses a release already created for this tag (e.g. a draft
+        # made in the web UI) and only creates one if none exists.
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          gh release create "$GITHUB_REF_NAME" dist/*.zip \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "$GITHUB_REF_NAME" \
-            --generate-notes
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/*.zip --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/*.zip \
+              --title "$GITHUB_REF_NAME" \
+              --generate-notes
+          fi

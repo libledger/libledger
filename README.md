@@ -94,7 +94,7 @@ Targets:
 
 ### Continuous integration
 
-GitHub Actions (`.github/workflows/build.yml`) builds and smoke-tests `ledger` on Linux, macOS and Windows for every push and pull request, and uploads the binaries as workflow artifacts. Pushing a tag such as `v1.0.0` also creates a GitHub release with the zipped binaries for all three platforms.
+GitHub Actions (`.github/workflows/build.yml`) builds and smoke-tests `ledger` on Linux, macOS and Windows for every push and pull request, and uploads the binaries as workflow artifacts. Pushing a tag such as `v1.0.0` (or publishing a release for a new tag in the GitHub UI) also attaches the zipped binaries for all three platforms to that tag's release, creating the release if it does not exist yet.
 
 ## Design principles
 
