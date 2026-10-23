@@ -43,9 +43,58 @@ The manuscript uses `noweb` to extract compilable source code from the explanato
 
 ## Building and running
 
-The implementation uses **C**, **SQLite**, and **cJSON**. The literate-programming workflow also uses **noweb** to extract code from the manuscript.
+The implementation uses **C**, **SQLite**, and **cJSON**. The literate-programming workflow also uses **noweb** to extract code from the manuscript; the extracted sources (`ledger.h`, `ledger_impl.c`, `ledger_cli.c`) are committed here, so noweb is not needed to build.
 
-Build instructions and available targets depend on the files included in this repository. Consult the project's `Makefile` and source tree for the exact commands and dependencies in this release.
+### Requirements
+
+- A C compiler (`gcc` or `clang`) and GNU Make
+- Either the SQLite and cJSON development packages, **or** `curl`/`wget` and `unzip` so the Makefile can download them
+
+### Build
+
+```sh
+make
+./ledger help
+```
+
+The Makefile picks how to get the dependencies:
+
+- If `pkg-config` finds `sqlite3` and `libcjson`, it links against the system libraries.
+- Otherwise it downloads the SQLite amalgamation (3.46.1) and cJSON (1.7.19) into `deps/` and compiles them into the binary, so no system packages are needed. The download happens only on the first build.
+
+You can force either mode:
+
+```sh
+make USE_SYSTEM_LIBS=0   # always use the bundled copies in deps/
+make USE_SYSTEM_LIBS=1   # always use the system libraries
+```
+
+Targets:
+
+| Target | Effect |
+| --- | --- |
+| `make` | Build `ledger` (and `libledger.a`) |
+| `make deps` | Only download the bundled dependencies |
+| `make clean` | Remove objects, the library and the binary |
+| `make distclean` | Also remove `deps/` |
+
+### Platform notes
+
+- **Linux (Debian/Ubuntu):** `sudo apt install build-essential libsqlite3-dev libcjson-dev` to use the system libraries, or just `make` to use the bundled copies.
+- **macOS:** install the Xcode Command Line Tools (`xcode-select --install`) and run `make`. The stock GNU Make 3.81 works.
+- **Windows:** build from an [MSYS2](https://www.msys2.org/) **UCRT64** shell:
+
+  ```sh
+  pacman -S make unzip curl mingw-w64-ucrt-x86_64-gcc
+  make
+  ./ledger.exe help
+  ```
+
+  MinGW lacks POSIX `getline()`, so on Windows the Makefile also builds a small shim from `compat/`.
+
+### Continuous integration
+
+GitHub Actions (`.github/workflows/build.yml`) builds and smoke-tests `ledger` on Linux, macOS and Windows for every push and pull request, and uploads the binaries as workflow artifacts. Pushing a tag such as `v1.0.0` also creates a GitHub release with the zipped binaries for all three platforms.
 
 ## Design principles
 
