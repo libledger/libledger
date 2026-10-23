@@ -69,6 +69,12 @@ jobs:
           ./${{ matrix.exe }} balance --db ci.db --company acme
           ./${{ matrix.exe }} check --db ci.db --company acme
 
+      - name: Tests and the book's examples
+        # The examples compare output byte for byte; on Windows the
+        # line endings differ, so they run on Linux and macOS.
+        if: runner.os != 'Windows'
+        run: make USE_SYSTEM_LIBS=0 check
+
       - name: Upload binary
         uses: actions/upload-artifact@v7
         with:
@@ -90,6 +96,8 @@ jobs:
           ./ledger company --db ci.db acme
           ./ledger chart --db ci.db --company acme
           ./ledger check --db ci.db --company acme
+      - name: Tests and the book's examples
+        run: make USE_SYSTEM_LIBS=1 check
 
   release:
     name: release

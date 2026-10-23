@@ -23,7 +23,7 @@ The project includes a C library, a `ledger` command-line application, and an MC
 ## The book
 
 **[Double-Entry Accounting: A Literate Programming Implementation](https://leanpub.com/literateledger)**  
-* C, SQLite and an AI bookkeeper, built chunk by chunk.
+*C, SQLite and an AI bookkeeper, built chunk by chunk.*
 
 The book starts with accounting fundamentals—no prior accounting experience required—and develops the implementation step by step. It also follows a fictional freelancer through practical bookkeeping examples, first using the CLI and later an AI assistant.
 
@@ -41,9 +41,23 @@ The manuscript uses `noweb` to extract compilable source code from the explanato
 | `ledger mtm` | USD mark-to-market valuation |
 | `ledger mcp` | MCP server for AI-assistant integration |
 
+## What is in this repository
+
+Everything here except the build files is extracted from the book, so you can build, run and test the program without **noweb**, which is only needed to write the book.
+
+| Path | Contents | In the book |
+| --- | --- | --- |
+| `ledger.h` | The public header: types, error codes, functions | Chapters 3–10 |
+| `ledger_impl.c` | The library | Chapters 3–10 |
+| `ledger_cli.c` | The `ledger` command, `check`, `mtm` and the MCP server | Chapters 11–14 |
+| `examples/` | The shell sessions of the executable chapters and the output the book prints; the C example of Chapter 8; `sql-edit.c` | Chapters 2, 8, 12, 13, 15 |
+| `skills/libledger-bookkeeper/SKILL.md` | The bookkeeping skill for the AI assistant | Appendix A |
+| `tests/` | The test suites of the library, the command line and the MCP server | — |
+| `Makefile`, `compat/`, `.github/` | Portable build and CI (not from the book) | — |
+
 ## Building and running
 
-The implementation uses **C**, **SQLite**, and **cJSON**. The literate-programming workflow also uses **noweb** to extract code from the manuscript; the extracted sources (`ledger.h`, `ledger_impl.c`, `ledger_cli.c`) are committed here, so noweb is not needed to build.
+The implementation uses **C**, **SQLite**, and **cJSON**.
 
 ### Requirements
 
@@ -74,9 +88,37 @@ Targets:
 | Target | Effect |
 | --- | --- |
 | `make` | Build `ledger` (and `libledger.a`) |
+| `make check` | Run the test suites and every example of the book, comparing its output with the book's |
 | `make deps` | Only download the bundled dependencies |
 | `make clean` | Remove objects, the library and the binary |
 | `make distclean` | Also remove `deps/` |
+
+Prebuilt binaries for Linux, macOS and Windows are attached to each [release](https://github.com/libledger/libledger/releases).
+
+## Following the book
+
+`make check` runs every example of the book and checks that the program prints, byte for byte, what the book prints. To follow one by hand, run it in an empty directory of its own, since each example creates its database there:
+
+```sh
+make check                      # builds ledger and build/sql-edit too
+mkdir week && cd week
+sh ../examples/alex-week.sh ../ledger
+```
+
+| Example | Chapter | Arguments |
+| --- | --- | --- |
+| `examples/alex-week.sh` | 2, A Week in Alex's Books | `../ledger` |
+| `examples/post-example.c` | 8, Journal Entries (Using the Library from C) | built as `build/post-example` |
+| `examples/check-demo.sh` | 12, Reporting Problems (Damaged Books) | `../ledger ../build/sql-edit` |
+| `examples/mtm-demo.sh` | 13, Valuing the Books in USD | `../ledger` |
+| `examples/alex-day.sh` | 15, One Day, Two Ways | `../ledger` |
+
+What each prints is in `examples/<name>.expected`, which is the output printed in the book.
+
+To let an AI assistant keep the books (Chapter 14 and Appendix A):
+
+- point your MCP client at the binary: command `/path/to/ledger`, arguments `["mcp", "--db", "/path/to/books.db", "--company", "<name>"]`;
+- install the skill by copying `skills/libledger-bookkeeper/` into `~/.claude/skills/` (Claude Code) or the skills folder of your assistant.
 
 ### Platform notes
 
@@ -114,6 +156,8 @@ GitHub Actions (`.github/workflows/build.yml`) builds and smoke-tests `ledger` o
 ## Feedback and contributions
 
 Bug reports, questions, and suggestions are welcome through GitHub Issues. When reporting a problem, please include the relevant command or API call, expected behavior, and observed result.
+
+The C files, examples, skill and tests are generated from the book's source, so a fix is made there first and then exported here. Pull requests are still welcome as a way to show a fix; they are applied to the book, and the next export brings them back to this repository.
 
 ## License
 

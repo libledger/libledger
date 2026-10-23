@@ -1,0 +1,93 @@
+Database initialized: alex.db
+Company 'alex' added.
+Chart of accounts created: 49 accounts.
+Posted journal entry 1.
+Posted journal entry 2.
+{
+  "id": 2,
+  "date": "2025-06-30T10:00:00Z",
+  "description": "Invoice XYZ: brand identity",
+  "system": "",
+  "end2end": "inv-2025-042",
+  "debits": [{
+      "account_code": "1.1.4",
+      "account_name": "ACCOUNTS RECEIVABLE",
+      "amount": "8000.00",
+      "currency": "USD"
+    }],
+  "credits": [{
+      "account_code": "4.1",
+      "account_name": "SALARY / PROFESSIONAL FEES",
+      "amount": "8000.00",
+      "currency": "USD"
+    }],
+  "properties": {
+    "client": "XYZ",
+    "project": "brand identity"
+  }
+}
+Posted journal entry 3.
+Posted journal entry 4.
+post: debit line 1: account '5.3' is not a leaf
+Posted journal entry 5.
+Posted journal entry 6.
+Posted journal entry 7.
+T-Account: 2.1.1  CREDIT CARD  (USD)
+JID  Date       Description                     Debit     Credit    Balance
+1    2025-06-30 Opening balances                         1500.00    1500.00
+3    2025-06-30 Groceries                                  86.40    1586.40
+4    2025-07-01 Adobe Creative Cloud                       59.99    1646.39
+Posted journal entry 8.
+Posted journal entry 9.
+post: account 1.1.1 CASH ON HAND would have a negative balance: -42.00 USD
+Posted journal entry 10.
+Posted journal entry 11.
+1                ASSETS                                          11466.61 USD
+1.1                CURRENT ASSETS                                 6466.61 USD
+1.2                INVESTMENTS                                       0.00 USD
+1.3                PROPERTY AND EQUIPMENT                         5000.00 USD
+2                LIABILITIES                                         0.00 USD
+2.1                CURRENT LIABILITIES                               0.00 USD
+2.2                LONG-TERM LIABILITIES                             0.00 USD
+3                EQUITY                                           5500.00 USD
+3.1                OWNER'S CAPITAL                                5500.00 USD
+3.2                RETAINED EARNINGS                                 0.00 USD
+4                REVENUE                                          8000.00 USD
+4.1                SALARY / PROFESSIONAL FEES                     8000.00 USD
+4.2                INVESTMENT INCOME                                 0.00 USD
+4.3                OTHER INCOME                                      0.00 USD
+5                EXPENSES                                         2033.39 USD
+5.1                HOUSING                                        1800.00 USD
+5.2                GROCERIES                                        86.40 USD
+5.3                TRANSPORTATION                                   45.00 USD
+5.4                EDUCATION                                         0.00 USD
+5.5                HEALTHCARE                                        0.00 USD
+5.6                ENTERTAINMENT AND CULTURE                        42.00 USD
+5.7                CLOTHING                                          0.00 USD
+5.8                BUSINESS SOFTWARE                                59.99 USD
+5.9                MISCELLANEOUS                                     0.00 USD
+Trial balance USD: debit-normal 13500.00, credit-normal 13500.00  OK
+T-Account: 1.1.2  CHECKING ACCOUNT  (USD)
+JID  Date       Description                     Debit     Credit    Balance
+1    2025-06-30 Opening balances              2000.00               2000.00
+5    2025-07-01 Fuel                                       45.00    1955.00
+6    2025-07-02 XYZ pays inv-2025-042         8000.00               9955.00
+7    2025-07-03 July rent                                1800.00    8155.00
+8    2025-07-03 Credit card, paid in full                1646.39    6508.61
+9    2025-07-03 Transfer to savings                      2000.00    4508.61
+10   2025-07-04 ATM withdrawal                            100.00    4408.61
+Checking balanced entries...
+  OK
+Checking cached leaf balances...
+  OK
+Checking postings to branch accounts...
+  OK
+Checking account codes...
+  OK
+Posted journal entry 12.
+1                ASSETS                                          11466.61 USD
+2                LIABILITIES                                         0.00 USD
+3                EQUITY                                          11466.61 USD
+4                REVENUE                                             0.00 USD
+5                EXPENSES                                            0.00 USD
+Trial balance USD: debit-normal 11466.61, credit-normal 11466.61  OK

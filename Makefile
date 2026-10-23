@@ -62,7 +62,7 @@ else
   DEP_HDRS := $(SQLITE_DIR)/sqlite3.h $(CJSON_DIR)/cJSON.h
 endif
 
-.PHONY: all clean distclean deps
+.PHONY: all clean distclean deps check
 
 all: $(PROG)
 
@@ -77,6 +77,40 @@ $(LIB): ledger_impl.o
 
 compat/getline_compat.o: compat/getline_compat.c compat/getline_compat.h
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+# ---- tests and the book's examples ----------------------------------
+#
+# make check runs the test suites, then every example of the book and
+# compares what it prints with what the book prints (examples/*.expected).
+# Only the output counts: some examples end on a failing command on
+# purpose.  Work files go to build/.
+
+EXAMPLES := alex-week check-demo mtm-demo alex-day
+TOOL_DEPS := $(LIB) $(DEP_OBJS) $(COMPAT_OBJS)
+
+build/test_ledger$(EXE): tests/test_ledger.c ledger.h $(TOOL_DEPS)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) -I. $(CFLAGS) $(LDFLAGS) -o $@ $< $(TOOL_DEPS) $(LDLIBS)
+
+build/%$(EXE): examples/%.c ledger.h $(TOOL_DEPS)
+	@mkdir -p build
+	$(CC) $(CPPFLAGS) -I. $(CFLAGS) $(LDFLAGS) -o $@ $< $(TOOL_DEPS) $(LDLIBS)
+
+check: $(PROG) build/test_ledger$(EXE) build/post-example$(EXE) \
+       build/sql-edit$(EXE)
+	cd build && ./test_ledger$(EXE)
+	sh tests/test_mcp.sh ./$(PROG) build
+	sh tests/test_cli.sh ./$(PROG) build
+	cd build && ./post-example$(EXE) > post-example.out
+	diff -u examples/post-example.expected build/post-example.out
+	@echo "=== Chapter 8: the C example prints what the book says ==="
+	@for name in $(EXAMPLES); do \
+	    rm -rf build/run-$$name && mkdir -p build/run-$$name; \
+	    (cd build/run-$$name && sh ../../examples/$$name.sh \
+	        ../../$(PROG) ../sql-edit$(EXE) > ../$$name.out); \
+	    diff -u examples/$$name.expected build/$$name.out || exit 1; \
+	    echo "=== examples/$$name.sh: the program matches the book ==="; \
+	done
 
 # ---- bundled dependencies -------------------------------------------
 
@@ -108,6 +142,7 @@ $(CJSON_DIR)/cJSON.o: $(CJSON_DIR)/cJSON.c $(CJSON_DIR)/cJSON.h
 
 clean:
 	rm -f ledger ledger.exe $(LIB) *.o compat/*.o $(SQLITE_DIR)/*.o $(CJSON_DIR)/*.o
+	rm -rf build
 
 distclean: clean
 	rm -rf deps

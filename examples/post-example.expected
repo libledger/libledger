@@ -1,0 +1,2 @@
+entry 1 posted; CHECKING ACCOUNT is now 800.00 USD
+posting to 1.1: error -1, debit line 1: account '1.1' is not a leaf
